@@ -103,6 +103,39 @@ class FibonacciHeap {
             }
         }
 
+        void cut(Node* x, Node* y) {
+            if (x->right == x) {
+                y->child = nullptr;
+            } else {
+                x->right->left = x->left;
+                x->left->right = x->right;
+                if (y->child == x) {
+                    y->child = x->right;
+                }
+            }
+            y->degree--;
+
+            x->right = minNode->right;
+            x->left = minNode;
+            minNode->right->left = x;
+            minNode->right = x;
+
+            x->p = nullptr;
+            x->mark = false;
+        }
+
+        void cascadingCut(Node* y) {
+            Node* z = y->p;
+            if (z != nullptr) {
+                if (y->mark == false) {
+                    y->mark = true;
+                } else {
+                    cut(y, z);
+                    cascadingCut(z);
+                }
+            }
+        }
+
     public:
         FibonacciHeap() {
             minNode = nullptr;
