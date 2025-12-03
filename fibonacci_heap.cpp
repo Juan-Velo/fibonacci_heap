@@ -190,6 +190,45 @@ class FibonacciHeap {
             return -1;
         }
 
+        int extractMin() {
+            if (minNode == nullptr) {
+                cout << "El heap está vacío." << endl;
+                return -1;
+            }
+            
+            Node* z = minNode;
+            if (z->child != nullptr) {
+                Node* child = z->child;
+                vector<Node*> children;
+                do {
+                    children.push_back(child);
+                    child = child->right;
+                } while (child != z->child);
+    
+                for (Node* x : children) {
+                    x->right = minNode->right;
+                    x->left = minNode;
+                    minNode->right->left = x;
+                    minNode->right = x;
+                    x->p = nullptr;
+                }
+            }
+    
+            z->left->right = z->right;
+            z->right->left = z->left;
+    
+            if (z == z->right) {
+                minNode = nullptr;
+            } else {
+                minNode = z->right;
+                consolidate();
+            }
+            n--;
+            int minKey = z->key;
+            delete z;
+            return minKey;
+        }
+
 };
 
 
