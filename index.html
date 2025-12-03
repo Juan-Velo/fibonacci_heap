@@ -122,5 +122,133 @@
         </div>
     </div>
 
+
+    <!-- SCRIPT COMPLETO -->
+    <script type="text/javascript">
+        let snapshots = [];
+        let currentStep = 0;
+        let network = null;
+
+        const options = {
+            height: '100%',
+            width: '100%',
+            layout: {
+                hierarchical: {
+                    enabled: true,
+                    direction: "UD",
+                    sortMethod: "directed",
+                    nodeSpacing: 200,
+                    levelSeparation: 150,
+                    shakeTowards: 'roots'
+                }
+            },
+            nodes: {
+                shape: 'circle',
+                font: { color: '#ffffff' },
+                borderWidth: 2
+            },
+            edges: {
+                arrows: 'to',
+                smooth: {
+                    type: 'cubicBezier',
+                    forceDirection: 'vertical',
+                    roundness: 0.4
+                }
+            },
+            physics: {
+                hierarchicalRepulsion: {
+                    nodeDistance: 200,
+                    avoidOverlap: 1
+                }
+            }
+        };
+
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                snapshots = await response.json();
+                if (snapshots.length > 0) {
+                    renderStep(0);
+                } else {
+                    document.getElementById('step-info').innerText = "No hay datos.";
+                }
+            } catch (error) {
+                document.getElementById('step-info').innerText =
+                    "Error cargando datos. Ejecuta el programa C++ primero.";
+            }
+        }
+
+        function renderStep(index) {
+            if (index < 0 || index >= snapshots.length) return;
+
+            currentStep = index;
+            const snapshot = snapshots[index];
+
+            document.getElementById('step-info').innerText =
+                `${index + 1}/${snapshots.length}: ${snapshot.description}`;
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === snapshots.length - 1;
+
+            const nodes = new vis.DataSet(snapshot.nodes.map(n => {
+                let color = { background: '#97c2fc', border: '#2B7CE9' };
+                let fontColor = '#ffffff';
+
+                if (n.group === 'min') {
+                    color = { background: '#ffff00', border: '#e6e600' };
+                    fontColor = '#000000';
+                } else if (n.group === 'marked') {
+                    color = { background: '#ffcccc', border: '#ff0000' };
+                    fontColor = '#000000';
+                }
+
+                return {
+                    id: n.id,
+                    label: n.label,
+                    title: n.title,
+                    level: n.level,
+                    color,
+                    font: { color: fontColor }
+                };
+            }));
+
+            const edges = new vis.DataSet(snapshot.edges.map(e => {
+                const edge = { ...e };
+
+                if (edge.from === edge.to) {
+                    if (edge.label === 'L') {
+                        edge.color = { color: '#FF00FF' };
+                        edge.font = { color: '#FF00FF', background: '#252526' };
+                        edge.selfReference = { angle: Math.PI * 0.75 };
+                    } else if (edge.label === 'R') {
+                        edge.color = { color: '#00FF00' };
+                        edge.font = { color: '#00FF00', background: '#252526' };
+                        edge.selfReference = { angle: Math.PI * 1.75 };
+                    }
+                    delete edge.smooth;
+                }
+
+                return edge;
+            }));
+
+            const container = document.getElementById('mynetwork');
+            const data = { nodes, edges };
+
+            if (network) network.setData(data);
+            else network = new vis.Network(container, data, options);
+
+            setTimeout(() => network.fit(), 100);
+        }
+
+        function nextStep() {
+            if (currentStep < snapshots.length - 1) renderStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            if (currentStep > 0) renderStep(currentStep - 1);
+        }
+
+        window.onload = loadData;
+    </script>
+
 </body>
 </html>
