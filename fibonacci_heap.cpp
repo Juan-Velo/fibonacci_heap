@@ -167,6 +167,29 @@ class FibonacciHeap {
             minNode = nullptr;
             n = 0;
         }
+
+        Node* insert(int key) {
+            Node* node = new Node(key);
+            if (minNode == nullptr) {
+                minNode = node;
+            } else {
+                node->left = minNode;
+                node->right = minNode->right;
+                minNode->right->left = node;
+                minNode->right = node;
+                if (key < minNode->key) {
+                    minNode = node;
+                }
+            }
+            n++;
+            return node;
+        }
+
+        int findMin() {
+            if (minNode) return minNode->key;
+            return -1;
+        }
+
 };
 
 
