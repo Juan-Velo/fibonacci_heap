@@ -297,6 +297,44 @@ class FibonacciHeap {
                 }
             }
 
+            void getGraphData(vector<string>& nodesJson, vector<string>& edgesJson) {
+                if (minNode == nullptr) return;
+
+                Node* startNode = minNode;
+                Node* curr = startNode;
+                if (curr) {
+                    do {
+                        traverseAndCollect(curr, nodesJson, edgesJson, 0);
+                        curr = curr->right;
+                    } while (curr != startNode);
+                }
+            }
+
+            void display() {
+                if (minNode == nullptr) {
+                    cout << "(Heap Vacio)" << endl;
+                    return;
+                }
+                cout << "Estructura del Heap (Raices):" << endl;
+                cout << "-----------------------------" << endl;
+
+                vector<Node*> roots;
+                Node* curr = minNode;
+                if (curr) {
+                    do {
+                        roots.push_back(curr);
+                        curr = curr->right;
+                    } while (curr != minNode);
+                }
+
+                for (size_t i = 0; i < roots.size(); ++i) {
+                    printTree(roots[i], "", true);
+                    cout << "   (Siguiente raiz -->)" << endl;
+                }
+                cout << "-----------------------------" << endl;
+                cout << "Total Nodos: " << n << endl << endl;
+            }
+
 };
 
 
