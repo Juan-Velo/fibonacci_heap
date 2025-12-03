@@ -402,7 +402,81 @@ void printHeader(string titulo) {
     cout << "========================================" << endl;
 }
 
-int main(){
+int main() {
+    vector<Node*> savedNodes; 
+
+    printHeader("1. CREATENEWHEAP()");
+    FibonacciHeap* H1 = new FibonacciHeap();
+    cout << "Heap H1 creado correctamente (inicialmente vacio)." << endl;
+    H1->display();
+    saveSnapshot(H1, nullptr, "1. Heap H1 creado (vacio)");
+
+    printHeader("2. INSERT(H, x)");
+    cout << "Insertando en H1: 10, 20, 5 (min)..." << endl;
+    H1->insert(10);
+    saveSnapshot(H1, nullptr, "2.1 Insert 10 en H1");
+    H1->insert(20);
+    saveSnapshot(H1, nullptr, "2.2 Insert 20 en H1");
+    H1->insert(5);
+    saveSnapshot(H1, nullptr, "2.3 Insert 5 en H1");
+
+    cout << "Creando H2 e insertando: 15, 100, 50..." << endl;
+    FibonacciHeap* H2 = new FibonacciHeap();
+    H2->insert(15);
+    Node* n100 = H2->insert(100);
+    Node* n50 = H2->insert(50);
+    
+    cout << "\n---> Estado de H1:" << endl;
+    H1->display();
+    cout << "\n---> Estado de H2:" << endl;
+    H2->display();
+    saveSnapshot(H1, H2, "2.4 H1 y H2 antes de Union");
+
+    printHeader("3. FINDMINIMUN()");
+    cout << "El minimo actual de H1 es: " << H1->findMin() << endl;
+    cout << "El minimo actual de H2 es: " << H2->findMin() << endl;
+
+    printHeader("4. UNION(H1, H2)");
+    cout << "Uniendo H2 dentro de H1..." << endl;
+    H1->unionHeap(H2);
+    
+    cout << "\n--- DESPUES DE UNION (H1 ahora contiene todo) ---" << endl;
+    H1->display();
+    saveSnapshot(H1, nullptr, "4. Union H1 y H2");
+
+    printHeader("5. EXTRACTMINIMUN()");
+    cout << "Extrayendo el minimo de H1 (que es 5)..." << endl;
+    cout << "Esto detonara el proceso de CONSOLIDACION." << endl;
+    
+    int extracted = H1->extractMin();
+    cout << "Valor extraido: " << extracted << endl;
+
+    cout << "\n--- DESPUES DE EXTRACT MIN ---" << endl;
+    H1->display();
+    saveSnapshot(H1, nullptr, "5. Extract Min (Consolidacion)");
+
+    printHeader("6. DECREASEKEY(H, x, k)");
+    cout << "Disminuyendo la clave 50 a 2..." << endl;
+    
+    H1->decreaseKey(n50, 2);
+
+    cout << "\n--- DESPUES DE DECREASE KEY ---" << endl;
+    H1->display();
+    saveSnapshot(H1, nullptr, "6. Decrease Key 50 -> 2");
+
+    printHeader("7. DELETE(H, x)");
+    cout << "Eliminando el nodo 100..." << endl;
+    
+    H1->deleteNode(n100);
+
+    cout << "\n--- DESPUES DE DELETE ---" << endl;
+    H1->display();
+    saveSnapshot(H1, nullptr, "7. Delete Node 100");
+
+    writeJsonFile();
+
+    delete H1;
+    delete H2;
 
     return 0;
 }
