@@ -335,6 +335,32 @@ class FibonacciHeap {
                 cout << "Total Nodos: " << n << endl << endl;
             }
 
+            void unionHeap(FibonacciHeap* h2) {
+                if (h2->minNode == nullptr) return;
+                if (minNode == nullptr) {
+                    minNode = h2->minNode;
+                    n = h2->n;
+                } else {
+                    Node* min1 = minNode;
+                    Node* min2 = h2->minNode;
+                    Node* right1 = min1->right;
+                    Node* left2 = min2->left;
+                    
+                    min1->right = min2;
+                    min2->left = min1;
+                    left2->right = right1;
+                    right1->left = left2;
+                    
+                    if (h2->minNode->key < minNode->key) {
+                        minNode = h2->minNode;
+                    }
+                    n += h2->n;
+                }
+                h2->minNode = nullptr;
+                h2->n = 0;
+            }
+        };
+
 };
 
 
