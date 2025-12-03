@@ -249,6 +249,54 @@ class FibonacciHeap {
                 extractMin();
             }
 
+            void traverseAndCollect(Node* node, vector<string>& nodesJson, vector<string>& edgesJson, int level) {
+
+                stringstream ss;
+                ss << "{ \"id\": \"" << (long long)node << "\", \"label\": \"" << node->key << "\", \"group\": \"" << (node == minNode ? "min" : (node->mark ? "marked" : "node")) << "\"";
+                ss << ", \"title\": \"Degree: " << node->degree << "\", \"level\": " << level; 
+                ss << " }";
+                nodesJson.push_back(ss.str());
+        
+                if (node->right) {
+                    stringstream ssEdge;
+                    float roundnessR = (node->right == node) ? 0.2 : 0.2;
+                    string fontR = (node->right == node) ? ", \"font\": { \"align\": \"bottom\", \"background\": \"#252526\", \"color\": \"#00FF00\" }" : "";
+                    
+                    ssEdge << "{ \"from\": \"" << (long long)node << "\", \"to\": \"" << (long long)node->right << "\", \"label\": \"R\", \"arrows\": \"to\", \"color\": { \"color\": \"#00FF00\" }, \"smooth\": { \"type\": \"curvedCW\", \"roundness\": " << roundnessR << " }" << fontR << " }";
+                    edgesJson.push_back(ssEdge.str());
+                }
+        
+                if (node->left) {
+                    stringstream ssEdge;
+                    string typeL = (node->left == node) ? "curvedCW" : "curvedCCW";
+                    float roundnessL = (node->left == node) ? 0.6 : 0.5;
+                    string colorL = (node->left == node) ? "#FF00FF" : "#00FF00"; 
+                    string fontL = (node->left == node) ? ", \"font\": { \"align\": \"top\", \"background\": \"#252526\", \"color\": \"#FF00FF\" }" : "";
+        
+                    ssEdge << "{ \"from\": \"" << (long long)node << "\", \"to\": \"" << (long long)node->left << "\", \"label\": \"L\", \"arrows\": \"to\", \"color\": { \"color\": \"" << colorL << "\" }, \"smooth\": { \"type\": \"" << typeL << "\", \"roundness\": " << roundnessL << " }" << fontL << " }";
+                    edgesJson.push_back(ssEdge.str());
+                }
+        
+                if (node->p) {
+                    stringstream ssEdge;
+                    ssEdge << "{ \"from\": \"" << (long long)node << "\", \"to\": \"" << (long long)node->p << "\", \"label\": \"P\", \"arrows\": \"to\", \"dashes\": true, \"color\": { \"color\": \"#888888\" }, \"smooth\": { \"type\": \"curvedCW\", \"roundness\": 0.15 } }";
+                    edgesJson.push_back(ssEdge.str());
+                }
+        
+                if (node->child) {
+                    stringstream ssEdge;
+                    ssEdge << "{ \"from\": \"" << (long long)node << "\", \"to\": \"" << (long long)node->child << "\", \"label\": \"Child\", \"arrows\": \"to\", \"width\": 2, \"color\": { \"color\": \"#FFFFFF\" }, \"smooth\": { \"type\": \"curvedCW\", \"roundness\": 0.15 } }";
+                    edgesJson.push_back(ssEdge.str());
+                    
+                    Node* startNode = node->child;
+                    Node* curr = startNode;
+                    do {
+                        traverseAndCollect(curr, nodesJson, edgesJson, level + 1);
+                        curr = curr->right;
+                    } while (curr != startNode);
+                }
+            }
+
 };
 
 
