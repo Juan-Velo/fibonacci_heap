@@ -136,6 +136,32 @@ class FibonacciHeap {
             }
         }
 
+        void printTree(Node* node, string prefix, bool isTail) {
+            if (node == nullptr) return;
+            
+            cout << prefix;
+            cout << (isTail ? "+-- " : "|-- ");
+            
+            cout << "[Key: " << node->key << "]";
+            if (node->mark) cout << " (M)";
+            if (node == minNode) cout << " <--- MIN";
+            cout << endl;
+    
+            vector<Node*> children;
+            if (node->child != nullptr) {
+                Node* current = node->child;
+                do {
+                    children.push_back(current);
+                    current = current->right;
+                } while (current != node->child);
+            }
+    
+            for (size_t i = 0; i < children.size(); ++i) {
+                printTree(children[i], prefix + (isTail ? "    " : "|   "), i == children.size() - 1);
+            }
+        }
+    
+
     public:
         FibonacciHeap() {
             minNode = nullptr;
