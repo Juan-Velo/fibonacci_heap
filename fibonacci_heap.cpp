@@ -229,6 +229,26 @@ class FibonacciHeap {
             return minKey;
         }
 
+        void decreaseKey(Node* x, int newKey) {
+            if (newKey > x->key) {
+                cout << "Error: Nueva clave es mayor que la actual." << endl;
+                return;
+            }
+            x->key = newKey;
+            Node* y = x->p;
+            if (y != nullptr && x->key < y->key) {
+                cut(x, y);
+                cascadingCut(y);
+            }
+            if (x->key < minNode->key) {
+                minNode = x;
+            }
+
+            void deleteNode(Node* x) {
+                decreaseKey(x, -2147483648);
+                extractMin();
+            }
+
 };
 
 
